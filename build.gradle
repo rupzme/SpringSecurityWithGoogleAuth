@@ -1,0 +1,97 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'tomcat'
+apply plugin: 'cargo'
+
+sourceCompatibility = 1.7
+ext.tomcatVersion = '7.0.11'
+ext.cargoVersion = '1.3.3'
+
+eclipse {
+	project {
+		natures += [
+			'org.springsource.ide.eclipse.gradle.core.nature'
+		]
+	}
+}
+
+buildscript {
+	repositories {
+		jcenter()
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'org.gradle.api.plugins:gradle-tomcat-plugin:1.2.3'
+		classpath 'org.gradle.api.plugins:gradle-cargo-plugin:0.6.1'
+	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.11'
+}
+
+repositories {
+	maven {
+		url 'http://google-api-client-libraries.appspot.com/mavenrepo'
+	}
+    mavenCentral()
+}
+
+dependencies {
+	providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+	compile 'org.springframework:spring-webmvc:4.0.3.RELEASE'
+	compile 'org.springframework.security:spring-security-web:3.2.3.RELEASE'
+	compile 'org.springframework.security:spring-security-config:3.2.3.RELEASE'
+	
+	compile 'com.google.http-client:google-http-client:1.13.1-beta'
+	compile 'com.google.http-client:google-http-client-jackson:1.13.1-beta'
+	compile 'com.google.apis:google-api-services-oauth2:v2-rev29-1.13.2-beta'
+	
+	compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.0'
+	
+    compile group: 'commons-io', name: 'commons-io', version: '1.4'
+    compile group: 'log4j', name: 'log4j', version: '1.2.15', ext: 'jar'
+	
+	testCompile 'junit:junit:4.11'
+	
+	runtime "jstl:jstl:1.2"
+	
+	tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+		   "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}"
+	tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+		exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+		
+	cargo "org.codehaus.cargo:cargo-core-uberjar:${cargoVersion}",
+		"org.codehaus.cargo:cargo-ant:${cargoVersion}"
+	}
+	
+}
+
+ext {
+	tomcatStopPort = 8090
+	tomcatStopKey = 'stopKey'
+}
+
+tomcatRun {
+	httpPort = 8070
+	stopPort = tomcatStopPort
+	stopKey = tomcatStopKey
+}
+
+tomcatStop {
+	stopPort = tomcatStopPort
+	stopKey = tomcatStopKey
+}
+
+cargo {
+	containerId = 'tomcat7x'
+	port = 8080
+ 
+	local {
+		homeDir = file('/ApplicationServers/apache-tomcat-7.0.41')
+		output = file('/ApplicationServers/apache-tomcat-7.0.41/output.log')
+	}
+}
+
