@@ -32,3 +32,8 @@ cargo {
 Hello User
 
 5b. If you were already logged in, you should be just be redirected and presented with the same message as above.
+
+*TODOs*
+
+1. Replace System.outs with Log4J
+2. Secure (HTTPS) redirect URL to protect against interception of token.
